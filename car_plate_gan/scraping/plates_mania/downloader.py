@@ -1,8 +1,6 @@
 import enum
 import os.path
 from os import PathLike
-from time import sleep
-import multiprocessing as mp
 from typing import Union, List
 
 import cfscrape
@@ -42,11 +40,18 @@ class PlatesManiaDownloader:
         for page in tqdm(range(from_page, to_page), desc="Scraping page"):
             try:
                 self._download_page(writer, page)
-            except requests.exceptions.TooManyRedirects:
-                pass
+            except requests.exceptions.TooManyRedirects as e:
+                print(e)
 
     def _download_page(self, writer: CsvWriter, page_index: int):
         items = self._extract_gallery_items(page_index)
+
+        items = filter(
+            lambda item: not os.path.exists(os.path.join(self.images_folder, item.item_id + ".jpg")),
+            items
+        )
+
+        items = list(items)
 
         writer.write(items)
 
@@ -82,9 +87,9 @@ class PlatesManiaDownloader:
         return self.parser.parse_items(htmls)
 
     def _download_image(self, item_id: str):
+        path = os.path.join(self.images_folder, item_id + ".jpg")
         link = self._get_image_endpoint(item_id)
         data = self.scrapper.get(link).content
-        path = os.path.join(self.images_folder, item_id + ".jpg")
 
         with open(path, 'wb') as writer:
             writer.write(data)
