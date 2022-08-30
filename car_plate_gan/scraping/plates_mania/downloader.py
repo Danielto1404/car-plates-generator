@@ -46,13 +46,6 @@ class PlatesManiaDownloader:
     def _download_page(self, writer: CsvWriter, page_index: int):
         items = self._extract_gallery_items(page_index)
 
-        items = filter(
-            lambda item: not os.path.exists(os.path.join(self.images_folder, item.item_id + ".jpg")),
-            items
-        )
-
-        items = list(items)
-
         writer.write(items)
 
         for item in items:
@@ -80,6 +73,11 @@ class PlatesManiaDownloader:
         url = self._get_gallery_page_endpoint(page_index)
         html = self.scrapper.get(url).content
         item_ids = self.parser.extract_item_ids_from_gallery(html)
+
+        item_ids = filter(
+            lambda item_id: not os.path.exists(os.path.join(self.images_folder, item_id.split("nomer")[-1] + "jpg")),
+            item_ids
+        )
 
         links = [self._get_item_endpoint(item_id) for item_id in item_ids]
         htmls = [self.scrapper.get(link).content for link in links]

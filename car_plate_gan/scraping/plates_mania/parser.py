@@ -7,7 +7,7 @@ from .entities import ParsedItem
 
 class PlatesManiaHTMLParser:
     @staticmethod
-    def extract_item_ids_from_gallery(html):
+    def extract_item_ids_from_gallery(html) -> list[str]:
         soup = BeautifulSoup(html, "html.parser")
         items = soup.find_all("div", class_="panel-body")
 
