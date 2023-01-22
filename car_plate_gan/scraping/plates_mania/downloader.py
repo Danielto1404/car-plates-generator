@@ -5,7 +5,8 @@ from typing import Union, List, Optional, Set
 
 import cfscrape
 import requests
-from tqdm import tqdm
+import tqdm
+from tqdm import trange
 
 from car_plate_gan.scraping.csv import CsvWriter
 from .entities import ParsedItem
@@ -40,17 +41,23 @@ class PlatesManiaDownloader:
 
         os.makedirs(self.images_folder, exist_ok=True)
 
-    def download(self, from_page: int = 0, to_page: int = 10, create_file: bool = True):
+    def download(
+            self,
+            from_page: int = 0,
+            to_page: int = 10,
+            create_file: bool = True
+    ):
 
         writer = CsvWriter(os.path.join(self.root, "data.csv"), clazz=ParsedItem, create_file=create_file)
+        progress = trange(from_page, to_page, desc="scraping page")
 
-        for page in tqdm(range(from_page, to_page), desc="Scraping page"):
+        for page in progress:
             try:
-                self._download_page(writer, page)
+                self._download_page(writer, page, progress)
             except requests.exceptions.TooManyRedirects as e:
                 print(e)
 
-    def _download_page(self, writer: CsvWriter, page_index: int):
+    def _download_page(self, writer: CsvWriter, page_index: int, progress: tqdm.tqdm):
         items = self._extract_gallery_items(page_index)
         items = [i for i in items if i is not None]
 
@@ -62,16 +69,15 @@ class PlatesManiaDownloader:
                 unique_items.append(item)
                 unique_ids.add(item.plate_number)
 
-        items = list(filter(lambda x: x.plate_number not in self.downloaded, unique_items))
-
-        print(len(items))
-
+        items = [item for item in items if item.plate_number not in self.downloaded]
         self.downloaded |= set([item.plate_number for item in items])
 
         writer.write(items)
 
         for item in items:
             self._download_image(item.item_id)
+
+        progress.set_postfix_str(f"downloaded: {len(items)}")
 
     def _get_country_endpoint(self):
         return f"{self.base_url}/{self.country.value}"
