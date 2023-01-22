@@ -1,7 +1,7 @@
 import os
 from typing import Type, Iterable
 
-from car_plate_gan.scraping.plates_mania.entities import CsvContentProvider
+from .plates_mania.entities import CsvContentProvider
 
 __NEWLINE__ = '\n'
 
@@ -29,3 +29,8 @@ class CsvWriter:
             for data in iterable:
                 line = data.to_csv_row()
                 writer.write(line + __NEWLINE__)
+
+
+__all__ = [
+    "CsvWriter"
+]

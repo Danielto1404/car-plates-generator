@@ -1,1 +1,1 @@
-from .downloader import PlatesManiaDownloader, Country
+from .downloader import *

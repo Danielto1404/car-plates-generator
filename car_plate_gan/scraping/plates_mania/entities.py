@@ -37,3 +37,9 @@ class ParsedItem(CsvContentProvider):
     car_img: str
     plate_number: str
     small_plate_img: str
+
+
+__all__ = [
+    "CsvContentProvider",
+    "ParsedItem"
+]

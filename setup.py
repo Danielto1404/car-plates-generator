@@ -16,8 +16,10 @@ setup(
         'Car Licence Plates'
     ],
     install_requires=[
+        'torch',
         'numpy',
         'bs4',
+        'pandas',
         'tqdm',
         'requests',
         'cfscrape'

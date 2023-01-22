@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from bs4 import BeautifulSoup
 
@@ -9,6 +9,7 @@ class PlatesManiaHTMLParser:
     @staticmethod
     def extract_item_ids_from_gallery(html) -> list[str]:
         soup = BeautifulSoup(html, "html.parser")
+
         items = soup.find_all("div", class_="panel-body")
 
         # /us/nomer19826107
@@ -20,14 +21,19 @@ class PlatesManiaHTMLParser:
         return hrefs
 
     @staticmethod
-    def parse_items(htmls) -> List[ParsedItem]:
+    def parse_items(htmls) -> List[Optional[ParsedItem]]:
         return [PlatesManiaHTMLParser.parse_item(html) for html in htmls]
 
     @staticmethod
-    def parse_item(html) -> ParsedItem:
+    def parse_item(html) -> Optional[ParsedItem]:
         soup = BeautifulSoup(html, "html.parser")
 
-        content = soup.find("div", class_="container content").find("div", class_="panel-body")
+        content = soup.find("div", class_="container content")
+
+        if content is not None:
+            content = content.find("div", class_="panel-body")
+        else:
+            return None
 
         hrefs = content \
             .find("h3", class_="text-center margin-bottom-10") \
@@ -42,13 +48,18 @@ class PlatesManiaHTMLParser:
 
         car_tag = content.find("img", class_="img-responsive center-block")
 
-        plate_number = car_tag.get("alt").split(',')[0]
+        plate_number = car_tag.get("alt").split(",")[0]
         car_img = car_tag.get("src")
 
         return ParsedItem(
             car_name=car_name,
             car_img=car_img,
-            plate_number=plate_number,
+            plate_number="".join(plate_number.split()).upper(),
             small_plate_img=small_plate_img,
             item_id=car_img.split("/")[-1].split(".")[0]
         )
+
+
+__all__ = [
+    "PlatesManiaHTMLParser"
+]
