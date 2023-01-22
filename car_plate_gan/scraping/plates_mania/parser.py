@@ -26,7 +26,7 @@ class PlatesManiaHTMLParser:
         return [PlatesManiaHTMLParser.parse_item(html) for html in htmls]
 
     @staticmethod
-    def extract_car_name(content) -> str:
+    def extract_car_name(content: bs4.Tag) -> str:
         hrefs = content \
             .find("h3", class_="text-center margin-bottom-10") \
             .find_all("a")
@@ -67,7 +67,8 @@ class PlatesManiaHTMLParser:
 
         if content is not None:
             content = content.find("div", class_="panel-body")
-        else:
+
+        if content is None:
             return None
 
         car_name = PlatesManiaHTMLParser.extract_car_name(content)
