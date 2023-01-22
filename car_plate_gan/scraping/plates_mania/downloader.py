@@ -49,13 +49,13 @@ class PlatesManiaDownloader:
     ):
 
         writer = CsvWriter(os.path.join(self.root, "data.csv"), clazz=ParsedItem, create_file=create_file)
-        progress = trange(from_page, to_page, desc="scraping page")
+        progress = trange(from_page, to_page, desc="downloading")
 
         for page in progress:
             try:
                 self._download_page(writer, page, progress)
             except requests.exceptions.TooManyRedirects as e:
-                print(e)
+                progress.set_postfix_str(f"error: {e}")
 
     def _download_page(self, writer: CsvWriter, page_index: int, progress: tqdm.tqdm):
         items = self._extract_gallery_items(page_index)

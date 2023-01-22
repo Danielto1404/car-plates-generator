@@ -32,7 +32,7 @@ class PlatesManiaHTMLParser:
             .find_all("a")
 
         name_parts = [href.text for href in hrefs]
-        car_name = " ".join(name_parts)
+        car_name = " ".join(name_parts).replace(",", " ")
 
         return car_name
 
