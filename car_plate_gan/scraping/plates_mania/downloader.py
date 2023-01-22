@@ -112,7 +112,7 @@ class PlatesManiaDownloader:
         link = self._get_image_endpoint(item_id)
         data = self.scrapper.get(link).content
 
-        with open(path, 'wb') as writer:
+        with open(path, mode="wb") as writer:
             writer.write(data)
 
 

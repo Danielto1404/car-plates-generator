@@ -4,10 +4,7 @@ from typing import Iterable, List
 
 def _get_field_names(obj_or_clazz: dataclasses.dataclass) -> List[str]:
     fields = dataclasses.fields(obj_or_clazz)
-
-    return list(
-        map(lambda f: f.name, fields)
-    )
+    return [f.name for f in fields]
 
 
 @dataclasses.dataclass
@@ -20,7 +17,6 @@ class CsvContentProvider:
 
     def to_csv_row(self) -> str:
         fields = _get_field_names(self)
-
         values = map(lambda field: str(self.__getattribute__(field)), fields)
 
         return CsvContentProvider._to_csv_row(values)
